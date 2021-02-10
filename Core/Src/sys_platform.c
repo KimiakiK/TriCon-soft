@@ -42,7 +42,7 @@ void SysPlatformInit(void)
 #endif
 
 	/* Waiting for stability (OLED) */
-	HAL_Delay(100);
+	HAL_Delay(2000);
 
 	/* Initialize drivers */
 	DrvSwInit();
@@ -52,9 +52,9 @@ void SysPlatformInit(void)
 	initController();
 
 	/* 起動時はオープニングを実行 */
-	//currentApplicationId = APL_OPENING;
+	currentApplicationId = APL_OPENING;
 	//currentApplicationId = APL_PUZZLE;
-	currentApplicationId = APL_HOCKEY;
+	//currentApplicationId = APL_HOCKEY;
 	nextApplicationId = currentApplicationId;
 	ApplicationTable[currentApplicationId].init_func();
 }
