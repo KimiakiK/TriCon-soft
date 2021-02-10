@@ -7,12 +7,9 @@
 
 /********** Include **********/
 
+#include "common_type.h"
+#include "common_drv.h"
 #include "apl_puzzle.h"
-#include "stm32f3xx_hal.h"
-#include "sys_platform.h"
-#include "drv_sw.h"
-#include "drv_joystick.h"
-#include "drv_oled_ssd1306.h"
 #include "stdlib.h"
 
 /********** Define **********/
@@ -101,7 +98,7 @@ enum blockType {
 	BLOCK_PURPLE,
 };
 
-enum timerType {
+enum timerIdType {
 	TIMER_DOWN = 0,
 	TIMER_INPUT_LEFT,
 	TIMER_INPUT_RIGHT,

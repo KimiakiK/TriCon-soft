@@ -7,8 +7,8 @@
 
 /********** Include **********/
 
+#include "common_type.h"
 #include "drv_sw.h"
-#include "stm32f3xx_hal.h"
 #include "main.h"
 
 /********** Define **********/

@@ -10,11 +10,9 @@
 
 /********** Include **********/
 
-#include "stm32f3xx_hal.h"
-
 /********** Define **********/
 
-enum {
+enum joystickIdType {
 	JOYSTICK_L = 0,
 	JOYSTICK_C,
 	JOYSTICK_R,

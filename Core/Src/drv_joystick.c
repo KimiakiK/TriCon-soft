@@ -7,8 +7,8 @@
 
 /********** Include **********/
 
+#include "common_type.h"
 #include "drv_joystick.h"
-#include "stm32f3xx_hal.h"
 #include "stdlib.h"
 
 /********** Define **********/

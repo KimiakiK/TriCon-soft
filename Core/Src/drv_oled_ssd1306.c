@@ -7,8 +7,8 @@
 
 /********** Include **********/
 
+#include "common_type.h"
 #include "drv_oled_ssd1306.h"
-#include "stm32f3xx_hal.h"
 
 /********** Define **********/
 

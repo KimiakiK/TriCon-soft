@@ -10,8 +10,6 @@
 
 /********** Include **********/
 
-#include "stm32f3xx_hal.h"
-
 /********** Define **********/
 
 #define PUSH_NONE	0x00

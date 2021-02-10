@@ -10,8 +10,6 @@
 
 /********** Include **********/
 
-#include "stm32f3xx_hal.h"
-
 /********** Define **********/
 
 #define DOT_BLACK		0

@@ -7,12 +7,8 @@
 
 /********** Include **********/
 
-#include "sys_platform.h"
-#include "stm32f3xx_hal.h"
-#include "drv_sw.h"
-#include "drv_joystick.h"
-#include "drv_oled_ssd1306.h"
-#include "apl_puzzle.h"
+#include "common_type.h"
+#include "common_drv.h"
 
 /********** Define **********/
 
@@ -23,11 +19,19 @@
 /********** Variable **********/
 
 static uint32_t nextProcessingTick;
+static uint8_t currentApplicationId;
+static uint8_t nextApplicationId;
+static uint8_t connectedController;
+static uint8_t mainController;
 
 /********** Function Prototype **********/
 
+static void initController(void);
+static void checkController(void);
+
 /********** Function **********/
 
+/*=== 初期化関数 ===*/
 void SysPlatformInit(void)
 {
 #if 0
@@ -45,9 +49,16 @@ void SysPlatformInit(void)
 	DrvJoystickInit();
 	DrvOledInit();
 
-	AplPuzzleInit();
+	initController();
+
+	/* 起動時はオープニングを実行 */
+	//currentApplicationId = APL_OPENING;
+	currentApplicationId = APL_PUZZLE;
+	nextApplicationId = currentApplicationId;
+	ApplicationTable[currentApplicationId].init_func();
 }
 
+/*=== メインループ関数 ===*/
 void SysPlatformMain(void)
 {
 	/* 初回は即時に周期処理を実行 */
@@ -64,6 +75,8 @@ void SysPlatformMain(void)
 		/* 次回処理時間計算 (簡易版なので桁溢れは考慮しない) */
 		nextProcessingTick = currentTick + MAIN_PERIODIC;
 
+		nextApplicationId = currentApplicationId;
+
 		/* SW読み出し1回目 */
 		DrvSwReadFirst();
 		/* 表示更新(DMA転送開始) */
@@ -74,8 +87,61 @@ void SysPlatformMain(void)
 		DrvJoystickRead();
 		/* SW読み出し3回目(確定) */
 		DrvSwReadEnd();
+		/* コントローラー接続確認 */
+		checkController();
 
 		/* アプリケーション周期処理 */
-		AplPuzzleMain();
+		ApplicationTable[currentApplicationId].main_func();
+
+		/* アプリケーション切替判定・処理 */
+		if (nextApplicationId != currentApplicationId) {
+			ApplicationTable[nextApplicationId].init_func();
+			currentApplicationId = nextApplicationId;
+
+		}
+	}
+}
+
+/*=== 実行アプリケーション設定関数 ===*/
+void SysSetNextApplication(uint8_t application_id)
+{
+	if (application_id < APL_NUM) {
+		nextApplicationId = application_id;
+	}
+}
+
+/*=== 接続コントローラー取得関数 ===*/
+uint8_t SysGetConnectedController(void)
+{
+	return connectedController;
+}
+
+/*=== メインコントローラー取得関数 ===*/
+uint8_t SysGetMainController(void)
+{
+	return mainController;
+}
+
+/*=== コントローラー接続状態初期化関数 ===*/
+static void initController(void)
+{
+	connectedController = CONNECTED_NONE;
+	mainController = CONTROLLER_NUM;
+}
+
+/*=== コントローラー接続確認関数 ===*/
+static void checkController(void)
+{
+	uint8_t controller_id;
+	uint8_t sw;
+
+	for (controller_id=0; controller_id<CONTROLLER_NUM; controller_id++) {
+		sw = DrvSwGetState(controller_id);
+		if (sw != PUSH_NONE) {
+			connectedController |= (0x01 << controller_id);
+			if (mainController == CONTROLLER_NUM) {
+				mainController = controller_id;
+			}
+		}
 	}
 }
