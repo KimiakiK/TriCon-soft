@@ -10,28 +10,24 @@
 
 /********** Include **********/
 
+#include "stm32f3xx_hal.h"
+
 /********** Define **********/
 
-enum {
-	SW_L_A = 0,
-	SW_L_B,
-	SW_L_C,
-	SW_L_D,
-	SW_C_A,
-	SW_C_B,
-	SW_C_C,
-	SW_C_D,
-	SW_R_A,
-	SW_R_B,
-	SW_R_C,
-	SW_R_D,
-	SW_NUM
+#define PUSH_NONE	0x00
+#define PUSH_A		0x01
+#define PUSH_B		0x02
+#define PUSH_C		0x04
+#define PUSH_D		0x08
+
+enum swIdType {
+	SW_L = 0,
+	SW_C,
+	SW_R,
+	SW_ID_NUM
 };
 
-enum {
-	SW_OFF = 0,
-	SW_ON
-};
+#define SW_NUM		12
 
 /********** Type **********/
 
@@ -45,5 +41,6 @@ void DrvSwInit(void);
 void DrvSwReadFirst(void);
 void DrvSwReadMid(void);
 void DrvSwReadEnd(void);
+uint8_t DrvSwGetState(uint8_t sw_id);
 
 #endif /* DRIVER_SW_H_ */

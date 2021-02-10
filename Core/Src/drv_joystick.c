@@ -9,6 +9,7 @@
 
 #include "drv_joystick.h"
 #include "stm32f3xx_hal.h"
+#include "stdlib.h"
 
 /********** Define **********/
 
@@ -68,6 +69,7 @@ static uint16_t rawValues[JOYSTICK_ADC_NUM];
 /********** Function Prototype **********/
 
 static uint16_t drvJoystickGetAdcValue(uint8_t joystick_id);
+static void setSeed(void);
 
 /********** Function **********/
 
@@ -78,6 +80,8 @@ void DrvJoystickInit(void)
 	for (joystick_id=0; joystick_id<JOYSTICK_ADC_NUM; joystick_id++) {
 		rawValues[joystick_id] = 0;
 	}
+
+	setSeed();
 }
 
 void DrvJoystickSetConfig(ADC_HandleTypeDef * hadc, ADC_ChannelConfTypeDef * sConfig)
@@ -113,22 +117,22 @@ uint8_t DrvJoystickGetSimplePos(uint8_t joystick_id)
 {
 	uint8_t pos;
 
-	pos = SIMPLE_NONE;
+	pos = POS_NONE;
 
 	if (joystick_id < JOYSTICK_NUM) {
 		/* JUDGE: UP */
-		if (joystickAdcIdTable[joystick_id].H < SIMPLE_UP_THRESHOLD) {
-			pos |= SIMPLE_UP;
+		if (rawValues[joystickAdcIdTable[joystick_id].H] < POS_UP_THRESHOLD) {
+			pos |= POS_UP;
 		}/* JUDGE: DOWN */
-		else if (joystickAdcIdTable[joystick_id].H > SIMPLE_DOWN_THRESHOLD) {
-			pos |= SIMPLE_DOWN;
+		else if (rawValues[joystickAdcIdTable[joystick_id].H] > POS_DOWN_THRESHOLD) {
+			pos |= POS_DOWN;
 		}
 		/* JUDGE: LEFT */
-		if (joystickAdcIdTable[joystick_id].V < SIMPLE_LEFT_THRESHOLD) {
-			pos |= SIMPLE_LEFT;
+		if (rawValues[joystickAdcIdTable[joystick_id].V] < POS_LEFT_THRESHOLD) {
+			pos |= POS_LEFT;
 		}/* JUDGE: RIGHT */
-		else if (joystickAdcIdTable[joystick_id].V > SIMPLE_RIGHT_THRESHOLD) {
-			pos |= SIMPLE_RIGHT;
+		else if (rawValues[joystickAdcIdTable[joystick_id].V] > POS_RIGHT_THRESHOLD) {
+			pos |= POS_RIGHT;
 		}
 	}
 
@@ -148,4 +152,18 @@ static uint16_t drvJoystickGetAdcValue(uint8_t joystick_id)
 	HAL_ADC_Stop(adcHandle[joystickAdcConfig[joystick_id].id]);
 
 	return adc_value;
+}
+
+static void setSeed(void)
+{
+	uint16_t seed;
+	uint8_t joystick_id;
+
+	seed = 0;
+
+	for (joystick_id = 0; joystick_id < JOYSTICK_ADC_NUM; joystick_id ++) {
+		seed += drvJoystickGetAdcValue(joystick_id);
+	}
+
+	srand(seed);
 }
