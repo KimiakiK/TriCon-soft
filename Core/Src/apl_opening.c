@@ -169,9 +169,9 @@ static void displayLogoAnime(void);
 static void displayLogo(void);
 static void displayController(void);
 
-static void displaySprite(sprite_t sprite);
-static void displaySpriteOffset(sprite_t sprite, int16_t offset_x, int16_t offset_y);
-static void displaySpriteRotate(sprite_t sprite, uint8_t rotate, int16_t pos_x, int16_t pos_y);
+static void drawSprite(sprite_t sprite);
+static void drawSpriteOffset(sprite_t sprite, int16_t offset_x, int16_t offset_y);
+static void drawSpriteRotate(sprite_t sprite, uint8_t rotate, int16_t pos_x, int16_t pos_y);
 
 static void initTimer(void);
 static void updateTimer(void);
@@ -259,28 +259,28 @@ static void displayLogoAnime(void)
 	case ANIME_START:
 		/* "T"を左からスライドイン */
 		offset = animeFrame - (sprite_logo_t.x + sprite_logo_t.w);
-		displaySpriteOffset(sprite_logo_t, offset, 0);
+		drawSpriteOffset(sprite_logo_t, offset, 0);
 		if (offset >= -1) {
 			animeState = ANIME_R;
 			animeFrame = 0;
 		}
 		break;
 	case ANIME_R:
-		displaySprite(sprite_logo_t);
+		drawSprite(sprite_logo_t);
 		/* "r"を下からスライドイン */
 		offset = OLED_HEIGHT - (animeFrame * 2);
-		displaySpriteOffset(sprite_logo_r, 0, offset);
+		drawSpriteOffset(sprite_logo_r, 0, offset);
 		if (offset <= 2) {
 			animeState = ANIME_I;
 			animeFrame = 0;
 		}
 		break;
 	case ANIME_I:
-		displaySprite(sprite_logo_t);
-		displaySprite(sprite_logo_r);
+		drawSprite(sprite_logo_t);
+		drawSprite(sprite_logo_r);
 		/* "i"を右からスライドイン */
 		offset = OLED_WIDTH - (animeFrame * 4);
-		displaySpriteOffset(sprite_logo_i, offset, 0);
+		drawSpriteOffset(sprite_logo_i, offset, 0);
 		if (offset <= 4) {
 			animeState = ANIME_DONE;
 			animeFrame = 0;
@@ -297,10 +297,10 @@ static void displayLogo(void)
 {
 	DrvOledClearMemory();
 
-	displaySprite(sprite_logo_t);
-	displaySprite(sprite_logo_r);
-	displaySprite(sprite_logo_i);
-	displaySprite(sprite_logo_con);
+	drawSprite(sprite_logo_t);
+	drawSprite(sprite_logo_r);
+	drawSprite(sprite_logo_i);
+	drawSprite(sprite_logo_con);
 }
 
 static void displayController(void)
@@ -312,13 +312,13 @@ static void displayController(void)
 	}
 
 	if (timer[TIMER_BLINK] < BLINK_ON_TIME) {
-		displaySpriteRotate(sprite_press_the_button, ROTATE_NONE, 35, 58);
-		displaySpriteRotate(sprite_press_the_button, ROTATE_CW, 0, 2);
-		displaySpriteRotate(sprite_press_the_button, ROTATE_CCW, 122, 1);
+		drawSpriteRotate(sprite_press_the_button, ROTATE_NONE, 35, 58);
+		drawSpriteRotate(sprite_press_the_button, ROTATE_CW, 0, 2);
+		drawSpriteRotate(sprite_press_the_button, ROTATE_CCW, 122, 1);
 	}
 }
 
-static void displaySprite(sprite_t sprite)
+static void drawSprite(sprite_t sprite)
 {
 	uint8_t x, y;
 
@@ -329,7 +329,7 @@ static void displaySprite(sprite_t sprite)
 	}
 }
 
-static void displaySpriteOffset(sprite_t sprite, int16_t offset_x, int16_t offset_y)
+static void drawSpriteOffset(sprite_t sprite, int16_t offset_x, int16_t offset_y)
 {
 	uint8_t x, y;
 	int16_t target_x, target_y;
@@ -345,7 +345,7 @@ static void displaySpriteOffset(sprite_t sprite, int16_t offset_x, int16_t offse
 	}
 }
 
-static void displaySpriteRotate(sprite_t sprite, uint8_t rotate, int16_t pos_x, int16_t pos_y)
+static void drawSpriteRotate(sprite_t sprite, uint8_t rotate, int16_t pos_x, int16_t pos_y)
 {
 	uint8_t x, y;
 	int16_t target_x, target_y;

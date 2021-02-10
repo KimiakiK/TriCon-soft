@@ -10,6 +10,7 @@
 #include "common_type.h"
 #include "drv_joystick.h"
 #include "stdlib.h"
+#include "math.h"
 
 /********** Define **********/
 
@@ -52,12 +53,12 @@ const struct joystickAdcIdTableType joystickAdcIdTable[JOYSTICK_NUM] = {
 };
 
 const struct joystickAdcConfigType joystickAdcConfig[JOYSTICK_ADC_NUM] = {
-		{ID_ADC1, ADC_CHANNEL_2}, /* JOYSTICK_ADC_L_V */
-		{ID_ADC1, ADC_CHANNEL_1}, /* JOYSTICK_ADC_L_H */
-		{ID_ADC1, ADC_CHANNEL_4}, /* JOYSTICK_ADC_C_V */
-		{ID_ADC1, ADC_CHANNEL_3}, /* JOYSTICK_ADC_C_H */
-		{ID_ADC2, ADC_CHANNEL_2}, /* JOYSTICK_ADC_R_V */
-		{ID_ADC2, ADC_CHANNEL_1}  /* JOYSTICK_ADC_R_H */
+		{ID_ADC1, ADC_CHANNEL_1}, /* JOYSTICK_ADC_L_V */
+		{ID_ADC1, ADC_CHANNEL_2}, /* JOYSTICK_ADC_L_H */
+		{ID_ADC1, ADC_CHANNEL_3}, /* JOYSTICK_ADC_C_V */
+		{ID_ADC1, ADC_CHANNEL_4}, /* JOYSTICK_ADC_C_H */
+		{ID_ADC2, ADC_CHANNEL_1}, /* JOYSTICK_ADC_R_V */
+		{ID_ADC2, ADC_CHANNEL_2}  /* JOYSTICK_ADC_R_H */
 };
 
 /********** Variable **********/
@@ -121,19 +122,41 @@ uint8_t DrvJoystickGetSimplePos(uint8_t joystick_id)
 
 	if (joystick_id < JOYSTICK_NUM) {
 		/* JUDGE: UP */
-		if (rawValues[joystickAdcIdTable[joystick_id].H] < POS_UP_THRESHOLD) {
+		if (rawValues[joystickAdcIdTable[joystick_id].V] < POS_UP_THRESHOLD) {
 			pos |= POS_UP;
 		}/* JUDGE: DOWN */
-		else if (rawValues[joystickAdcIdTable[joystick_id].H] > POS_DOWN_THRESHOLD) {
+		else if (rawValues[joystickAdcIdTable[joystick_id].V] > POS_DOWN_THRESHOLD) {
 			pos |= POS_DOWN;
 		}
 		/* JUDGE: LEFT */
-		if (rawValues[joystickAdcIdTable[joystick_id].V] < POS_LEFT_THRESHOLD) {
+		if (rawValues[joystickAdcIdTable[joystick_id].H] < POS_LEFT_THRESHOLD) {
 			pos |= POS_LEFT;
 		}/* JUDGE: RIGHT */
-		else if (rawValues[joystickAdcIdTable[joystick_id].V] > POS_RIGHT_THRESHOLD) {
+		else if (rawValues[joystickAdcIdTable[joystick_id].H] > POS_RIGHT_THRESHOLD) {
 			pos |= POS_RIGHT;
 		}
+	}
+
+	return pos;
+}
+
+vector_t DrvJoystickGetAnalogPos(uint8_t joystick_id)
+{
+	vector_t pos;
+	float norm;
+
+	/* -1.0 〜 1.0の範囲に変換 */
+	pos.x = ((float)(rawValues[joystickAdcIdTable[joystick_id].H] * 2) / (float)ADC_MAX) - 1.0f;
+	pos.y = ((float)(rawValues[joystickAdcIdTable[joystick_id].V] * 2) / (float)ADC_MAX) - 1.0f;
+
+	/* ベクトルを正規化して位置データに変換 */
+	norm = sqrtf(pos.x * pos.x + pos.y * pos.y);
+	if (norm > ANALOG_THRESHOLD){
+		pos.x = pos.x / norm * fabsf(pos.x);
+		pos.y = pos.y / norm * fabsf(pos.y);
+	} else {
+		pos.x = 0.0f;
+		pos.y = 0.0f;
 	}
 
 	return pos;

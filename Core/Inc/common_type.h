@@ -16,6 +16,11 @@
 
 /********** Type **********/
 
+typedef struct vectorType {
+	float x;
+	float y;
+} vector_t;
+
 /********** Constant **********/
 
 /********** Variable **********/

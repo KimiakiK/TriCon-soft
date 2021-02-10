@@ -37,6 +37,8 @@ enum joystickIdType {
 #define POS_LEFT_THRESHOLD	POS_THRESHOLD
 #define POS_RIGHT_THRESHOLD	(ADC_MAX - POS_THRESHOLD)
 
+#define ANALOG_THRESHOLD	0.4f
+
 /********** Type **********/
 
 /********** Constant **********/
@@ -49,5 +51,6 @@ void DrvJoystickInit(void);
 void DrvJoystickSetConfig(ADC_HandleTypeDef * hadc, ADC_ChannelConfTypeDef * sConfig);
 void DrvJoystickRead(void);
 uint8_t DrvJoystickGetSimplePos(uint8_t joystick_id);
+vector_t DrvJoystickGetAnalogPos(uint8_t joystick_id);
 
 #endif /* INC_DRV_JOYSTICK_H_ */

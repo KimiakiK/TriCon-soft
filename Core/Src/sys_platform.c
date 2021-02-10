@@ -53,7 +53,8 @@ void SysPlatformInit(void)
 
 	/* 起動時はオープニングを実行 */
 	//currentApplicationId = APL_OPENING;
-	currentApplicationId = APL_PUZZLE;
+	//currentApplicationId = APL_PUZZLE;
+	currentApplicationId = APL_HOCKEY;
 	nextApplicationId = currentApplicationId;
 	ApplicationTable[currentApplicationId].init_func();
 }
